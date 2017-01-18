@@ -35,7 +35,7 @@ Such a file must contain as set of key=value lines, where each key represent a c
 The namespace to use for generating RDF objects. If no namespace is provided http://purl.org/example/ is used as deafault.
 
 4. -o,--output <file>
-The name of the file where to store the resulting RDF. If no file is provided the RDF is printed on screen.
+<span style="margin-right: 30px;">The name of the file where to store the resulting RDF. If no file is provided the RDF is printed on screen.
 
 ## Example
  Let's take the following table as a possible CSV file, named *people.csv*, to convert to RDF.
