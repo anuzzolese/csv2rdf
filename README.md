@@ -22,10 +22,10 @@ java -jar stlab.csv2rdf-1.0.jar [OPTIONS] CSV_FILE
 
 The options available are the following:
 
-* -s,--separator &lt;char&gt;
+* -s,--separator &lt;char&gt;   
 The character used as separator withing the CSV file (e.g. , or ;).
 
-* -m,--mapping &lt;file&gt;
+* -m,--mapping &lt;file&gt;   
 A file providing the mappping between CSV columns and the properties of 						a target ontology/vocabulary.
 Such a file must contain as set of key=value lines, where each key represent a column position in the source CSV (starting from 1) and each value is a property form a target ontology or vocabulary. The following is an example that associates the properties http://xmlns.com/foaf/0.1/givenName and http://xmlns.com/foaf/0.1/familyName to the second and third columns of a given source CSV:
     
@@ -33,8 +33,8 @@ Such a file must contain as set of key=value lines, where each key represent a c
     2=http://xmlns.com/foaf/0.1/givenName
     3=http://xmlns.com/foaf/0.1/lastName
     ```
-* -n,--namespace &lt;uri&gt;
-	The namespace to use for generating RDF objects. If no namespace is provided http://purl.org/example/ is used as deafault.
+* -n,--namespace &lt;uri&gt;   
+The namespace to use for generating RDF objects. If no namespace is provided http://purl.org/example/ is used as deafault.
 
 * -o,--output &lt;file&gt;  
 The name of the file where to store the resulting RDF. If no file is provided the RDF is printed on screen.
