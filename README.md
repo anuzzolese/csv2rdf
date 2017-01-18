@@ -34,7 +34,7 @@ Such a file must contain as set of key=value lines, where each key represent a c
     3=http://xmlns.com/foaf/0.1/lastName
     ```
 * -n,--namespace &lt;uri&gt;
-The namespace to use for generating RDF objects. If no namespace is provided http://purl.org/example/ is used as deafault.
+	The namespace to use for generating RDF objects. If no namespace is provided http://purl.org/example/ is used as deafault.
 
 * -o,--output &lt;file&gt;  
 The name of the file where to store the resulting RDF. If no file is provided the RDF is printed on screen.
