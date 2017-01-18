@@ -39,11 +39,11 @@ The name of the file where to store the resulting RDF. If no file is provided th
 ## Example
  Let's take the following table as a possible CSV file, named *people.csv*, to convert to RDF.
  
- |Name|Last name|Affiliation|
- |----|:--------:|-----------:|
- |Andrea|Nuzzolese|STLab, ISTC-CNR|
- |Tim|Berners-Lee|W3C|
- |Paolo|Ciancarini|University of Bologna| 
+| Name   | Last name | Affiliation |
+| ----   |:--------:|-----------:|
+| Andrea | Nuzzolese | STLab, ISTC-CNR |
+| Tim | Berners-Lee | W3C |
+| Paolo | Ciancarini | University of Bologna | 
  
  Additionally, the following file, named *mapping* and containing key=value pairs, define the mapping to be used in order to generate the properties.
  ```java
