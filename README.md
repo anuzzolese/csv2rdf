@@ -26,6 +26,7 @@ The character used as separator withing the CSV file (e.g. , or ;).
 2. -m,--mapping <file>     
 A file providing the mappping between CSV columns and the properties of 						a target ontology/vocabulary.
 Such a file must contain as set of key=value lines, where each key represent a column position in the source CSV (starting from 1) and each value is a property form a target ontology or vocabulary. The following is an example that associates the properties http://xmlns.com/foaf/0.1/givenName and http://xmlns.com/foaf/0.1/familyName to the second and third columns of a given source CSV:
+    
     ```java
     2=http://xmlns.com/foaf/0.1/givenName
     3=http://xmlns.com/foaf/0.1/lastName
