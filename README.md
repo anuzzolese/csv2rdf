@@ -52,7 +52,6 @@ The name of the file where to store the resulting RDF. If no file is provided th
  ```java
  1=http://xmlns.com/foaf/0.1/givenName
  2=http://xmlns.com/foaf/0.1/lastName
- 3=https://www.w3.org/ns/org#memberOf
  ``` 
  
  Hence, the following line provides the example about how to use the tool from command line in order to obtain RDF from CSV and saving its content into a file named *people.ttl*. We suppose that the input CSV is actually a tab-separated file.
