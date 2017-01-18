@@ -1,3 +1,4 @@
+
 # csv2rdf
 
 csv2rdf is an Java based application, which relies on Apache Jena to convert tabular data to RDF.
@@ -21,12 +22,10 @@ java -jar stlab.csv2rdf-1.0.jar [OPTIONS] CSV_FILE
 
 The options available are the following:
 
-<ul>
-<li style="list-style-type: none;">-s,--separator <char>   
+* -s,--separator &lt;char&gt;
 The character used as separator withing the CSV file (e.g. , or ;).
-</li>
-</ul>
-2. -m,--mapping <file>     
+
+* -m,--mapping &lt;file&gt;
 A file providing the mappping between CSV columns and the properties of 						a target ontology/vocabulary.
 Such a file must contain as set of key=value lines, where each key represent a column position in the source CSV (starting from 1) and each value is a property form a target ontology or vocabulary. The following is an example that associates the properties http://xmlns.com/foaf/0.1/givenName and http://xmlns.com/foaf/0.1/familyName to the second and third columns of a given source CSV:
     
@@ -34,11 +33,11 @@ Such a file must contain as set of key=value lines, where each key represent a c
     2=http://xmlns.com/foaf/0.1/givenName
     3=http://xmlns.com/foaf/0.1/lastName
     ```
-3. -n,--namespace <uri>    
+* -n,--namespace &lt;uri&gt;
 The namespace to use for generating RDF objects. If no namespace is provided http://purl.org/example/ is used as deafault.
 
-4. -o,--output <file>
-<p style="margin: 0 0 0 30px;">The name of the file where to store the resulting RDF. If no file is provided the RDF is printed on screen.</p>
+* -o,--output &lt;file&gt;  
+The name of the file where to store the resulting RDF. If no file is provided the RDF is printed on screen.
 
 ## Example
  Let's take the following table as a possible CSV file, named *people.csv*, to convert to RDF.
