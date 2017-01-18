@@ -10,6 +10,8 @@ import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.util.Dictionary;
+import java.util.Properties;
 
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.CommandLineParser;
@@ -20,7 +22,6 @@ import org.apache.commons.cli.Option.Builder;
 import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
 import org.apache.commons.lang3.StringEscapeUtils;
-import org.apache.jena.propertytable.graph.GraphCSV;
 import org.apache.jena.propertytable.lang.CSV2RDF;
 import org.apache.jena.rdf.model.Model;
 import org.apache.jena.rdf.model.ModelFactory;
@@ -31,6 +32,7 @@ import org.apache.jena.rdf.model.StmtIterator;
 
 import au.com.bytecode.opencsv.CSVReader;
 import au.com.bytecode.opencsv.CSVWriter;
+import it.cnr.istc.stlab.csv2rdf.csvgraph.GraphCSV;
 
 public class Csv2Rdf {
 
@@ -78,9 +80,18 @@ public class Csv2Rdf {
                 .longOpt(NAMESPACE_OPTIONS_LONG)
                 .build();
         
+        optionBuilder = Option.builder(MAPPING_OPTION);
+        Option mappingOption = optionBuilder.argName("file")
+                .desc("File providing the mappping between CSV columns and the properties of a target ontology/vocabulary.")
+                .hasArg()
+                .required(false)
+                .longOpt(MAPPING_OPTIONS_LONG)
+                .build();
+        
         options.addOption(separatorOption);
         options.addOption(outputOption);
         options.addOption(namespaceOption);
+        options.addOption(mappingOption);
         
         CommandLine commandLine = null;
         
@@ -114,7 +125,6 @@ public class Csv2Rdf {
 				if(sepChar != ','){
 					try {
 	    				file = File.createTempFile("tmp", ".csv");
-	    				System.out.println(sepChar);
 	    				CSVReader reader = new CSVReader(new InputStreamReader(new FileInputStream(new File(csvFile).getAbsolutePath()), "UTF-8"), sepChar);
 	    				CSVWriter writer = new CSVWriter(new FileWriter(file)); 
 	    				String[] row = null;
@@ -125,9 +135,8 @@ public class Csv2Rdf {
 	    				reader.close();
 	    				writer.close();
 					} catch (IOException e) {
-	    				// TODO Auto-generated catch block
-	    				e.printStackTrace();
-	    			}
+						System.out.println("An error occurred while reading file " + csvFile + ".");
+	    			} 
     			}
 				else{
 					file = new File(csvFile);
@@ -136,7 +145,31 @@ public class Csv2Rdf {
 			
 			
 			if(file != null){
-				Model csv = ModelFactory.createModelForGraph(new GraphCSV(file.getPath())) ;
+				
+				String namespace = "http://purl.org/example/";
+				
+				if(commandLine.hasOption(NAMESPACE_OPTION)){
+					namespace = commandLine.getOptionValue(NAMESPACE_OPTION);
+					if(namespace == null)
+						namespace = "http://purl.org/example/";
+				}
+				Properties mapping = null;
+				if(commandLine.hasOption(MAPPING_OPTION)){
+					
+					String mappingFileName = commandLine.getOptionValue(MAPPING_OPTION);
+					if(mappingFileName != null){
+						mapping = new Properties();
+						try {
+							mapping.load(new FileInputStream(new File(mappingFileName)));
+						} catch (IOException e) {
+							System.out.print("An error occurred while reading the mapping file provided (i.e. the file named " + mappingFileName + ").");
+						}
+					}
+						
+						namespace = "http://purl.org/example/";
+				}
+				
+				Model csv = ModelFactory.createModelForGraph(new GraphCSV(namespace, mapping, file.getPath())) ;
 				
 				
 				OutputStream out = System.out;
@@ -151,14 +184,9 @@ public class Csv2Rdf {
 						out = System.out;
 					}
 				}
-				String namespace = "http://purl.org/example/";
+				model.add(csv.listStatements());
 				
-				if(commandLine.hasOption(NAMESPACE_OPTION)){
-					namespace = commandLine.getOptionValue(NAMESPACE_OPTION);
-					if(namespace == null)
-						namespace = "http://purl.org/example/";
-				}
-				
+				/*
 				final String ns = namespace;
 				try {
 					StmtIterator stmtIt = csv.listStatements();
@@ -189,6 +217,7 @@ public class Csv2Rdf {
 					// TODO Auto-generated catch block
 					e.printStackTrace();
 				}
+				*/
 				
 				model.write(out, "TURTLE");
 				
