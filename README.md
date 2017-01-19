@@ -33,6 +33,8 @@ The character used as separator within the CSV file (e.g. , or ;).
     2=http://xmlns.com/foaf/0.1/givenName
     3=http://dbpedia.org/ontology/birthDate > http://www.w3.org/2001/XMLSchema#date
     ```
+    
+ If no mapping or no value for a specific column in the mapping is provided then the URI for the predicate is generated from the column name by using either the default or the provided namespace.
 * -n,--namespace &lt;uri&gt;   
 The namespace to use for generating RDF objects. If no namespace is provided http://purl.org/example/ is used as default.
 

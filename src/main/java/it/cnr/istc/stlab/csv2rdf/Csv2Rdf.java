@@ -82,7 +82,9 @@ public class Csv2Rdf {
                 		+ ""
                 		+ "" 
                 		+ "    2=http://xmlns.com/foaf/0.1/givenName" + '\n'
-                		+ "    3=http://dbpedia.org/ontology/birthDate > http://www.w3.org/2001/XMLSchema#date")
+                		+ "    3=http://dbpedia.org/ontology/birthDate > http://www.w3.org/2001/XMLSchema#date "
+                		+ "If no mapping or no value for a specific column in the mapping is provided then the URI for the predicate is generated from the column name by using either the default or the provided namespace.")
+                
                 .hasArg()
                 .required(false)
                 .longOpt(MAPPING_OPTIONS_LONG)
