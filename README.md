@@ -41,7 +41,7 @@ The namespace to use for generating RDF objects. If no namespace is provided htt
 * -o,--output &lt;file&gt;  
 The name of the file where to store the resulting RDF. If no file is provided the RDF is printed on screen.
 
-* -f, --format &lt;string&gt;
+* -f, --format &lt;string&gt;   
 The format that the tool has to use in order to serialise the RDF output. 
 Available aternatives are: 
 	* TURTLE
