@@ -8,9 +8,6 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
-import java.net.URI;
-import java.net.URISyntaxException;
-import java.util.Dictionary;
 import java.util.Properties;
 
 import org.apache.commons.cli.CommandLine;
@@ -25,10 +22,6 @@ import org.apache.commons.lang3.StringEscapeUtils;
 import org.apache.jena.propertytable.lang.CSV2RDF;
 import org.apache.jena.rdf.model.Model;
 import org.apache.jena.rdf.model.ModelFactory;
-import org.apache.jena.rdf.model.Property;
-import org.apache.jena.rdf.model.RDFNode;
-import org.apache.jena.rdf.model.Resource;
-import org.apache.jena.rdf.model.StmtIterator;
 
 import au.com.bytecode.opencsv.CSVReader;
 import au.com.bytecode.opencsv.CSVWriter;
@@ -57,7 +50,7 @@ public class Csv2Rdf {
         
         Builder optionBuilder = Option.builder(SEPARATOR_OPTION);
         Option separatorOption = optionBuilder.argName("char")
-                                 .desc("Separator character.")
+                                 .desc("The character used as separator within the CSV file (e.g. , or ;).")
                                  .hasArg()
                                  .type(char.class)
                                  .required(false)
@@ -82,7 +75,14 @@ public class Csv2Rdf {
         
         optionBuilder = Option.builder(MAPPING_OPTION);
         Option mappingOption = optionBuilder.argName("file")
-                .desc("File providing the mappping between CSV columns and the properties of a target ontology/vocabulary.")
+                .desc("A file providing the mapping between CSV columns and the properties of a target ontology/vocabulary. "
+                		+ ""
+                		+ "" 
+                		+ "Such a file must contain as set of key=value lines, where each key represents a column position in the source CSV (the counting of positions starts from index 1) and each value is a pair property-datatype composed of property URI form a target ontology or vocabulary and a datatype URI. The property-datatype pairs are separated by the character '>'. The datatype is optional, hence it is possible to provide the property URI only without any datatype. The following is an example that associates the properties http://xmlns.com/foaf/0.1/givenName and http://dbpedia.org/ontology/birthDate to the second and third columns of a given source CSV. Additionally, the example specifies that the values associated with the property http://dbpedia.org/ontology/birthDate have to be typed as http://www.w3.org/2001/XMLSchema#date:"
+                		+ ""
+                		+ "" 
+                		+ "    2=http://xmlns.com/foaf/0.1/givenName" + '\n'
+                		+ "    3=http://dbpedia.org/ontology/birthDate > http://www.w3.org/2001/XMLSchema#date")
                 .hasArg()
                 .required(false)
                 .longOpt(MAPPING_OPTIONS_LONG)

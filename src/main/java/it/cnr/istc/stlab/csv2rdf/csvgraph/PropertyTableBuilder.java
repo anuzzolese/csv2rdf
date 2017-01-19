@@ -21,13 +21,19 @@ package it.cnr.istc.stlab.csv2rdf.csvgraph;
 import java.io.InputStream ;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.util.ArrayList ;
+import java.util.HashMap;
 import java.util.Iterator ;
 import java.util.List ;
+import java.util.Map;
 import java.util.Properties;
 
 import org.apache.jena.atlas.csv.CSVParser ;
 import org.apache.jena.atlas.io.IO ;
+import org.apache.jena.datatypes.RDFDatatype;
+import org.apache.jena.datatypes.TypeMapper;
 import org.apache.jena.datatypes.xsd.XSDDatatype ;
 import org.apache.jena.graph.Node ;
 import org.apache.jena.graph.NodeFactory ;
@@ -37,7 +43,7 @@ import org.apache.jena.propertytable.impl.PropertyTableArrayImpl;
 import org.apache.jena.propertytable.lang.LangCSV ;
 import org.apache.jena.rdf.model.ResourceFactory;
 import org.apache.jena.riot.system.IRIResolver ;
-
+import org.apache.jena.vocabulary.XSD;
 
 /**
  * A tool for constructing PropertyTable from a file (e.g., a CSV file).
@@ -111,15 +117,46 @@ public class PropertyTableBuilder {
 		else namespace = NAMESPACE;
 		
 		int colNum = 0;
+		
+		Map<Integer, String> columnDatatypes = new HashMap<Integer, String>();
         for (String column : row1) {
         	colNum++;
         	
+        	String rdfDatatype = null;
         	String uri = null;
         	if(MAPPING != null){
-        		uri = MAPPING.getProperty(String.valueOf(colNum));
-        		if(uri == null) uri = createColumnKeyURI(namespace, column);
+        		String value = MAPPING.getProperty(String.valueOf(colNum));
+        		if(value != null){
+        			String[] arr = value.split("\\>");
+        			String uriTmp = arr[0].trim();
+        			if(!uriTmp.isEmpty()){
+        				try {
+							new URI(uriTmp);
+							uri = uriTmp;
+						} catch (URISyntaxException e) {
+							uri = null;
+							System.out.println("The predicate URI " + uriTmp + " provided for column " + colNum + " is not a valid URI. Hence, it will be ignored and the default value will used for such a column.");
+						}
+		        		if(uri == null) uri = createColumnKeyURI(namespace, column);
+        			}
+        			if(arr.length>1){
+        				String datatype = arr[1].trim();
+        				if(!datatype.isEmpty()){
+        					try{
+        						new URI(datatype);
+        						rdfDatatype = datatype;
+        					} catch (URISyntaxException e) {
+								rdfDatatype = null;
+								System.out.println("The type " + datatype + " provided for column " + colNum + " is not a valid URI. Hence, it will be ignored.");
+							}
+        					
+        				}
+        			}
+        		}
         	}
         	else uri = createColumnKeyURI(namespace, column);
+        	
+        	if(rdfDatatype != null) columnDatatypes.put(colNum-1, rdfDatatype);
             
         	Node p = NodeFactory.createURI(uri);
             predicates.add(p);
@@ -128,7 +165,7 @@ public class PropertyTableBuilder {
         
         rowNum++ ;
         while(iter.hasNext()) {
-            List<String> rowLine = iter.next();
+        	List<String> rowLine = iter.next();
             Node subject = LangCSV.caculateSubject(rowNum, csvFilePath);
             Row row = table.createRow(subject);
 
@@ -143,30 +180,38 @@ public class PropertyTableBuilder {
                 }
                 Node o;
                 try {
-                    Class<?>[] clazzes = new Class<?>[]{Integer.class, Double.class, Boolean.class};
                 	
-                	Object obj = null;
-                	for(Class<?> clazz : clazzes){
-	                	Method method = clazz.getDeclaredMethod("valueOf", String.class);
-	                	
-	                	if (method != null) {
-	                	    try {
-	                	        obj = method.invoke(null, columnValue);
-	                	        if(obj instanceof Boolean && !columnValue.equalsIgnoreCase("false")){
-	                	        	obj = null;
-	                	        	continue;
-	                	        }
-	                	        else break;
-	
-	                	    } catch (InvocationTargetException ex) {
-	                	        obj = null;
-	                	    }
-	                	}
+                	String rdfDatatype = columnDatatypes.get(col);
+                	if(rdfDatatype != null){
+                		RDFDatatype jenaRdfDtatype = TypeMapper.getInstance().getSafeTypeByName(rdfDatatype); 
+                		o = NodeFactory.createLiteral(columnValue, jenaRdfDtatype);
                 	}
-                	                	 
-                	if(obj == null) obj = columnValue;
-                	
-                    o = ResourceFactory.createTypedLiteral(obj).asNode();
+                	else{
+	                    Class<?>[] clazzes = new Class<?>[]{Integer.class, Double.class, Boolean.class};
+	                	
+	                	Object obj = null;
+	                	for(Class<?> clazz : clazzes){
+		                	Method method = clazz.getDeclaredMethod("valueOf", String.class);
+		                	
+		                	if (method != null) {
+		                	    try {
+		                	        obj = method.invoke(null, columnValue);
+		                	        if(obj instanceof Boolean && !columnValue.equalsIgnoreCase("false")){
+		                	        	obj = null;
+		                	        	continue;
+		                	        }
+		                	        else break;
+		
+		                	    } catch (InvocationTargetException ex) {
+		                	        obj = null;
+		                	    }
+		                	}
+	                	}
+	                	                	 
+	                	if(obj == null) obj = columnValue;
+	                	
+	                    o = ResourceFactory.createTypedLiteral(obj).asNode();
+                	}
                 } catch (Exception e) {
                     o = NodeFactory.createLiteral(columnValue);
                 }

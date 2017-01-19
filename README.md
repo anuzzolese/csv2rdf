@@ -27,11 +27,11 @@ The character used as separator within the CSV file (e.g. , or ;).
 
 * -m,--mapping &lt;file&gt;   
 A file providing the mapping between CSV columns and the properties of 						a target ontology/vocabulary.
-Such a file must contain as set of key=value lines, where each key represent a column position in the source CSV (starting from 1) and each value is a property form a target ontology or vocabulary. The following is an example that associates the properties http://xmlns.com/foaf/0.1/givenName and http://xmlns.com/foaf/0.1/familyName to the second and third columns of a given source CSV:
     
+Such a file must contain as set of key=value lines, where each key represents a column position in the source CSV (the counting of positions starts from index 1) and each value is a pair property-datatype composed of property URI form a target ontology or vocabulary and a datatype URI. The property-datatype pairs are separated by the character '>'. The datatype is optional, hence it is possible to provide the property URI only without any datatype. The following is an example that associates the properties http://xmlns.com/foaf/0.1/givenName and http://dbpedia.org/ontology/birthDate to the second and third columns of a given source CSV. Additionally, the example specifies that the values associated with the property http://dbpedia.org/ontology/birthDate have to be typed as http://www.w3.org/2001/XMLSchema#date:
     ```java
     2=http://xmlns.com/foaf/0.1/givenName
-    3=http://xmlns.com/foaf/0.1/lastName
+    3=http://dbpedia.org/ontology/birthDate > http://www.w3.org/2001/XMLSchema#date
     ```
 * -n,--namespace &lt;uri&gt;   
 The namespace to use for generating RDF objects. If no namespace is provided http://purl.org/example/ is used as default.
@@ -40,48 +40,62 @@ The namespace to use for generating RDF objects. If no namespace is provided htt
 The name of the file where to store the resulting RDF. If no file is provided the RDF is printed on screen.
 
 ## Example
- Let's take the following table as a possible CSV file, named *people.csv*, to convert to RDF.
+ Let's take the following table as a possible CSV file, named *musicians.csv*, to convert to RDF.
  
-| Name   | Last name |
-| ----   |--------:|
-| Andrea | Nuzzolese |
-| Tim | Berners-Lee |
-| Paolo | Ciancarini | 
+| Name   | Last name | Albums | Date of birth |
+| ----   |:--------:|:--------:|--------:|
+| Miles | Davis | 102 | 1926-05-26 |
+| Tim | Berners-Lee | 90 | 1947-01-08 |
+| Paolo | Ciancarini | 123 | 1933-05-03 |
  
- Additionally, the following file, named *mapping* and containing key=value pairs, define the mapping to be used in order to generate the properties.
+ Additionally, the following file, named *mapping* and containing key=property>datatype pairs, define the mapping to be used in order to generate the properties.
  ```java
  1=http://xmlns.com/foaf/0.1/givenName
  2=http://xmlns.com/foaf/0.1/lastName
+ 3=http://foo.org/myont/numberOfAlbums
+ 4=http://dbpedia.org/ontology/birthDate > http://www.w3.org/2001/XMLSchema#date
  ``` 
  
- Hence, the following line provides the example about how to use the tool from command line in order to obtain RDF from CSV and saving its content into a file named *people.ttl*. We suppose that the input CSV is actually a tab-separated file.
+ Hence, the following line provides the example about how to use the tool from command line in order to obtain RDF from CSV and saving its content into a file named *musicians.ttl*. We suppose that the input CSV is actually a tab-separated file.
  ```bash
- java -jar stlab.csv2rdf-1.0.jar -s '\t' -m mapping -o people.ttl people.csv
+ java -jar stlab.csv2rdf-1.0.jar -s '\t' -m mapping -o musicians.ttl musicians.csv
  ```
  
  The execution of the tool with the arguments as provided in the example above produces the following RDF serialised by using the TURTLE syntax.
  ```turtle
- [ <http://w3c/future-csv-vocab/row>
+ [ <http://dbpedia.org/ontology/birthDate>
+          "1926-05-26"^^<http://www.w3.org/2001/XMLSchema#date> ;
+  <http://foo.org/myont/numberOfAlbums>
+          "102"^^<http://www.w3.org/2001/XMLSchema#int> ;
+  <http://w3c/future-csv-vocab/row>
           1 ;
   <http://xmlns.com/foaf/0.1/givenName>
-          "Andrea" ;
+          "Miles" ;
   <http://xmlns.com/foaf/0.1/lastName>
-          "Nuzzolese"
+          "Davis"
 ] .
 
-[ <http://w3c/future-csv-vocab/row>
+[ <http://dbpedia.org/ontology/birthDate>
+          "1947-01-8"^^<http://www.w3.org/2001/XMLSchema#date> ;
+  <http://foo.org/myont/numberOfAlbums>
+          "90"^^<http://www.w3.org/2001/XMLSchema#int> ;
+  <http://w3c/future-csv-vocab/row>
           2 ;
   <http://xmlns.com/foaf/0.1/givenName>
-          "Tim" ;
+          "David" ;
   <http://xmlns.com/foaf/0.1/lastName>
-          "Berners-Lee"
+          "Bowie"
 ] .
 
-[ <http://w3c/future-csv-vocab/row>
+[ <http://dbpedia.org/ontology/birthDate>
+          "1933-05-03"^^<http://www.w3.org/2001/XMLSchema#date> ;
+  <http://foo.org/myont/numberOfAlbums>
+          "123"^^<http://www.w3.org/2001/XMLSchema#int> ;
+  <http://w3c/future-csv-vocab/row>
           3 ;
   <http://xmlns.com/foaf/0.1/givenName>
-          "Paolo" ;
+          "James" ;
   <http://xmlns.com/foaf/0.1/lastName>
-          "Ciancarini"
+          "Brown"
 ] .
  ```
