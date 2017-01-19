@@ -22,6 +22,9 @@ import org.apache.commons.lang3.StringEscapeUtils;
 import org.apache.jena.propertytable.lang.CSV2RDF;
 import org.apache.jena.rdf.model.Model;
 import org.apache.jena.rdf.model.ModelFactory;
+import org.apache.jena.riot.Lang;
+import org.apache.jena.riot.RDFFormat;
+import org.apache.jena.riot.RiotException;
 
 import au.com.bytecode.opencsv.CSVReader;
 import au.com.bytecode.opencsv.CSVWriter;
@@ -41,6 +44,9 @@ public class Csv2Rdf {
 	public static final String MAPPING_OPTION = "m";
 	public static final String MAPPING_OPTIONS_LONG = "mapping";
 	
+	public static final String FORMAT_OPTION = "f";
+	public static final String FORMAT_OPTIONS_LONG = "format";
+	
 	public static void main(String[] args) {
 		
 		/*
@@ -59,7 +65,7 @@ public class Csv2Rdf {
         
         optionBuilder = Option.builder(OUTPUT_OPTION);
         Option outputOption = optionBuilder.argName("file")
-                .desc("RDF output file.")
+                .desc("The name of the file where to store the resulting RDF. If no file is provided the RDF is printed on screen.")
                 .hasArg()
                 .required(false)
                 .longOpt(OUTPUT_OPTIONS_LONG)
@@ -67,7 +73,7 @@ public class Csv2Rdf {
         
         optionBuilder = Option.builder(NAMESPACE_OPTION);
         Option namespaceOption = optionBuilder.argName("uri")
-                .desc("Namespace for resources.")
+                .desc("The namespace to use for generating RDF objects. If no namespace is provided http://purl.org/example/ is used as default.")
                 .hasArg()
                 .required(false)
                 .longOpt(NAMESPACE_OPTIONS_LONG)
@@ -90,10 +96,20 @@ public class Csv2Rdf {
                 .longOpt(MAPPING_OPTIONS_LONG)
                 .build();
         
+        
+        optionBuilder = Option.builder(FORMAT_OPTION);
+        Option formatOption = optionBuilder.argName("string")
+                .desc("The format that the tool has to use in order to serialise the RDF output. Available aternatives are: TURTLE, RDF/XML, RDF/XML-ABBREV, N-TRIPLES, JSON-LD, N3, RDF/JSON. If no explicit format is provided, the output is serialised as TURTLE by default.")
+                .hasArg()
+                .required(false)
+                .longOpt(FORMAT_OPTIONS_LONG)
+                .build();
+        
         options.addOption(separatorOption);
         options.addOption(outputOption);
         options.addOption(namespaceOption);
         options.addOption(mappingOption);
+        options.addOption(formatOption);
         
         CommandLine commandLine = null;
         
@@ -221,7 +237,21 @@ public class Csv2Rdf {
 				}
 				*/
 				
-				model.write(out, "TURTLE");
+				String format = null;
+				if(commandLine.hasOption(FORMAT_OPTION)){
+					format = commandLine.getOptionValue(FORMAT_OPTION);
+					if(format != null){
+						format = format.trim();
+						if(format.isEmpty()) format = null;
+					}
+				}
+				if(format == null) format = "TURTLE"; 
+				
+				try{
+					model.write(out, format);
+				} catch(RiotException e){
+					System.out.println("It was not possible to serialise the output because of the following reason: " + e.getMessage());
+				}
 				
 				file.delete();
 			}
