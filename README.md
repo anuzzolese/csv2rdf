@@ -45,8 +45,8 @@ The name of the file where to store the resulting RDF. If no file is provided th
 | Name   | Last name | Albums | Date of birth |
 | ----   |:--------:|:--------:|--------:|
 | Miles | Davis | 102 | 1926-05-26 |
-| Tim | Berners-Lee | 90 | 1947-01-08 |
-| Paolo | Ciancarini | 123 | 1933-05-03 |
+| David | Bowie | 90 | 1947-01-08 |
+| James | Brown | 123 | 1933-05-03 |
  
  Additionally, the following file, named *mapping* and containing key=property>datatype pairs, define the mapping to be used in order to generate the properties.
  ```java
