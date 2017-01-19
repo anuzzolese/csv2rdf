@@ -1,7 +1,7 @@
 
 # csv2rdf
 
-csv2rdf is an Java based application, which relies on Apache Jena to convert tabular data to RDF.
+csv2rdf is a Java based application, which relies on Apache Jena to convert tabular data to RDF.
 The binaries can be obtained by compiling the source code with MAVEN from command line, i.e.
 
 ## Compiling
