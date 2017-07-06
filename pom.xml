@@ -79,7 +79,7 @@
           <archive>
             <manifest>
               <addClasspath>true</addClasspath>
-              <mainClass>it.cnr.istc.stlab.csv2rdf.Csv2Rdf</mainClass>
+              <mainClass>it.cnr.istc.stlab.csv2rdf.cmd.Main</mainClass>
               <addDefaultImplementationEntries>true</addDefaultImplementationEntries>
             </manifest>
           </archive>
