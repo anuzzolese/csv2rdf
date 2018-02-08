@@ -71,11 +71,6 @@ public class Csv2Rdf {
 			String[] row = null;
 		
 			while((row = reader.readNext()) != null){
-				if(csvSize < 10){
-					for(String column : row)
-						System.out.println(getClass() + ": " + column);
-				
-				}
 				writer.writeNext(row);
 				csvSize++;
 			}
