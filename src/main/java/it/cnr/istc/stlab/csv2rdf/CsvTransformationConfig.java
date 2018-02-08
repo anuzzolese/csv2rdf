@@ -8,12 +8,14 @@ public class CsvTransformationConfig {
 	private URI csvUri;
 	private URI mappingUri;
 	private String namespace;
+	private String encoding;
 	
-	public CsvTransformationConfig(char separator, URI csvUri, URI mappingUri, String namespace) {
+	public CsvTransformationConfig(char separator, URI csvUri, URI mappingUri, String namespace, String encoding) {
 		this.separator = separator;
 		this.csvUri = csvUri;
 		this.mappingUri = mappingUri;
 		this.namespace = namespace;
+		this.encoding = encoding;
 	}
 
 	public char getSeparator() {
@@ -48,6 +50,13 @@ public class CsvTransformationConfig {
 		this.namespace = namespace;
 	}
 	
+	public String getEncoding() {
+		return encoding;
+	}
+	
+	public void setEncoding(String encoding) {
+		this.encoding = encoding;
+	}
 	
 	
 }

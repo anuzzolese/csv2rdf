@@ -157,8 +157,7 @@ public class PropertyTableBuilder {
         	else uri = createColumnKeyURI(namespace, column);
         	
         	if(rdfDatatype != null) columnDatatypes.put(colNum-1, rdfDatatype);
-            
-        	Node p = NodeFactory.createURI(uri);
+            Node p = NodeFactory.createURI(uri);
             predicates.add(p);
             table.createColumn(p);
         }

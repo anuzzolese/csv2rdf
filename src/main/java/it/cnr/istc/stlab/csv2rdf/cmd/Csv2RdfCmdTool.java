@@ -40,6 +40,9 @@ public class Csv2RdfCmdTool {
 	public static final String FORMAT_OPTION = "f";
 	public static final String FORMAT_OPTIONS_LONG = "format";
 	
+	public static final String ENCODING_OPTION = "e";
+	public static final String ENCODING_OPTIONS_LONG = "encoding";
+	
 	public static void main(String[] args) {
 		
 		/*
@@ -70,6 +73,14 @@ public class Csv2RdfCmdTool {
                 .hasArg()
                 .required(false)
                 .longOpt(NAMESPACE_OPTIONS_LONG)
+                .build();
+        
+        optionBuilder = Option.builder(ENCODING_OPTION);
+        Option encodingOption = optionBuilder.argName("string")
+                .desc("The character encoding used in the input file. If not provided UTF-8 is used as default.")
+                .hasArg()
+                .required(false)
+                .longOpt(ENCODING_OPTIONS_LONG)
                 .build();
         
         optionBuilder = Option.builder(MAPPING_OPTION);
@@ -103,6 +114,7 @@ public class Csv2RdfCmdTool {
         options.addOption(namespaceOption);
         options.addOption(mappingOption);
         options.addOption(formatOption);
+        options.addOption(encodingOption);
         
         CommandLine commandLine = null;
         
@@ -135,6 +147,12 @@ public class Csv2RdfCmdTool {
 				if(namespace == null)
 					namespace = "http://purl.org/example/";
 			}
+			
+			String encoding = "UTF-8";
+			if(commandLine.hasOption(ENCODING_OPTION)){
+				String enc = commandLine.getOptionValue(ENCODING_OPTION);
+				if(enc != null) encoding = enc;
+			}
         	
         	URI csvUri = null;
         	URI mappingUri = null;
@@ -156,7 +174,7 @@ public class Csv2RdfCmdTool {
 				System.exit(1);
 			}
         	
-        	CsvTransformationConfig cfg = new CsvTransformationConfig(sepChar, csvUri, mappingUri, namespace);
+        	CsvTransformationConfig cfg = new CsvTransformationConfig(sepChar, csvUri, mappingUri, namespace, encoding);
         	Model model = null;
 			try {
 				model = Csv2Rdf.getInstance().convert(cfg);
@@ -169,8 +187,12 @@ public class Csv2RdfCmdTool {
 			if(commandLine.hasOption(OUTPUT_OPTION)){
 				try {
 					String value = commandLine.getOptionValue(OUTPUT_OPTION);
-					if(value != null)
+					if(value != null){
+						File outFile = new File(value);
+						if(!outFile.getParentFile().exists()) outFile.getParentFile().mkdirs();
+						
 						out = new FileOutputStream(new File(value));
+					}
 					else out = System.out;
 				} catch (FileNotFoundException e) {
 					e.printStackTrace();

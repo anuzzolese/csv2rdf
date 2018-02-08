@@ -49,7 +49,6 @@ public class Csv2Rdf {
 	public Model convert(CsvTransformationConfig csvTransformationConfig) throws CsvReadingException {
 		
 		
-		
 		Model model = ModelFactory.createDefaultModel();
 		
 		File file = null;
@@ -62,15 +61,21 @@ public class Csv2Rdf {
 			file = File.createTempFile("tmp", ".csv");
 			
 			URI csvUri = csvTransformationConfig.getCsvUri();
+			
 			InputStream csvIs = null;
 			if(!csvUri.isAbsolute()) csvIs = new FileInputStream(new File(csvUri.toString()));
 			else csvIs = csvUri.toURL().openStream();
 			
-			CSVReader reader = new CSVReader(new InputStreamReader(csvIs, "UTF-8"), sepChar);
+			CSVReader reader = new CSVReader(new InputStreamReader(csvIs, csvTransformationConfig.getEncoding()), sepChar);
 			CSVWriter writer = new CSVWriter(new FileWriter(file)); 
 			String[] row = null;
 		
 			while((row = reader.readNext()) != null){
+				if(csvSize < 10){
+					for(String column : row)
+						System.out.println(getClass() + ": " + column);
+				
+				}
 				writer.writeNext(row);
 				csvSize++;
 			}
@@ -79,7 +84,7 @@ public class Csv2Rdf {
 			writer.close();
 		} catch (IOException e) {
 			System.out.println("An error occurred while reading file " + csvTransformationConfig.toString() + ".");
-			
+			System.out.println('\t' + e.getMessage());
 		}
 		
 		if(file != null){
@@ -90,14 +95,18 @@ public class Csv2Rdf {
 			try {
 				
 				URI mappingUri = csvTransformationConfig.getMappingUri();
-				InputStream mappingIs = null;
-				if(!mappingUri.isAbsolute()) mappingIs = new FileInputStream(new File(mappingUri.toString()));
-				else mappingIs = mappingUri.toURL().openStream();
-				
-				mapping.load(mappingIs);
+				if(mappingUri != null){
+					InputStream mappingIs = null;
+					if(!mappingUri.isAbsolute()) mappingIs = new FileInputStream(new File(mappingUri.toString()));
+					else mappingIs = mappingUri.toURL().openStream();
+					
+					mapping.load(mappingIs);
+				}
+				else mapping = null;
 			} catch (IOException e) {
 				mapping = null;
 				System.out.print("An error occurred while reading the mapping file provided (i.e. the file named " + csvTransformationConfig.getMappingUri().toString() + ").");
+				System.out.println('\t' + e.getMessage());
 			}
 			
 			Model csv = ModelFactory.createModelForGraph(new GraphCSV(namespace, mapping, file.getPath())) ;
