@@ -189,7 +189,7 @@ public class Csv2RdfCmdTool {
 					String value = commandLine.getOptionValue(OUTPUT_OPTION);
 					if(value != null){
 						File outFile = new File(value);
-						if(!outFile.getParentFile().exists()) outFile.getParentFile().mkdirs();
+						if(outFile.getParentFile() != null && !outFile.getParentFile().exists()) outFile.getParentFile().mkdirs();
 						
 						out = new FileOutputStream(new File(value));
 					}
